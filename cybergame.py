@@ -6,7 +6,7 @@ import textwrap
 pygame.init()
 
 # Constants
-WIDTH, HEIGHT = 1366, 766
+SIZE = WIDTH, HEIGHT = 1366, 766
 BG_COLOR = (46, 49, 49)        # Dark Gray
 TEXT_COLOR = (255, 255, 255)   # White
 BUTTON_COLOR = (52, 152, 219)  # Blue
@@ -17,6 +17,10 @@ BUTTON_HOVER_TEXT_COLOR = (255, 255, 255)  # White
 BUTTON_WIDTH, BUTTON_HEIGHT = 200, 50
 BUTTON_RADIUS = 10
 SMALL_BUTTON_WIDTH, SMALL_BUTTON_HEIGHT = 50, 30
+
+FPS = 30
+screen = pygame.display.set_mode(SIZE, pygame.RESIZABLE)
+clock = pygame.time.Clock()
 
 # Create the Pygame window
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -52,11 +56,33 @@ placeholder_font = pygame.font.Font(None, )  # You can adjust the font size
 game_state = "menu"  # Initial state is the menu
 
 # Text typing effect
+
+def blit_text(surface, text, pos, font, color=pygame.Color('black')):
+    words = [word.split(' ') for word in text.splitlines()]  # 2D array where each row is a list of words.
+    space = font.size(' ')[0]  # The width of a space.
+    max_width, max_height = surface.get_size()
+    x, y = pos
+    for line in words:
+        for word in line:
+            word_surface = font.render(word, 0, color)
+            word_width, word_height = word_surface.get_size()
+            if x + word_width >= max_width:
+                x = pos[0]  # Reset the x.
+                y += word_height  # Start on new row.
+            surface.blit(word_surface, (x, y))
+            x += word_width + space
+        x = pos[0]  # Reset the x.
+        y += word_height  # Start on new row.
+
 typing_effect_text = '''Introduction: In an era of constantly evolving cybersecurity threats, the digital landscape presents ever-increasing challenges. Every year, new and more sophisticated forms of malware emerge, putting individuals' personal information and digital security at risk. Whether it's safeguarding your passwords, staying vigilant against phishing attempts, protecting your data, or navigating the internet securely. The choices you make in your daily online life can have significant consequences. In this series, we embark on a journey to impart essential knowledge about password security, phishing awareness, data protection, and safe internet usage. Our aim is to engage and educate you in a fun and interactive manner, empowering you to navigate the digital realm with confidence. By arming yourself with these skills, you can effectively thwart cybercriminals' traps and safeguard your personal information in today's ever-evolving digital world.'''
 typed_text = ""
 text_speed = 50  # Adjust the speed by changing the delay (lower value for faster typing)
 typing_index = 0
 typing_timer = pygame.time.get_ticks()
+
+font = pygame.font.SysFont('Arial', 64)
+
+
 
 # Main loop
 running = True
@@ -74,6 +100,17 @@ while running:
                         game_state = "level1"
                     elif game_state == "level1":
                         # Display the sentences with word wrapping
+                        while True:
+
+                            dt = clock.tick(FPS) / 1000
+
+                            for event in pygame.event.get():
+                                if event.type == pygame.QUIT:
+                                    quit()
+
+                            screen.fill(pygame.Color('white'))
+                            blit_text(screen, typing_effect_text, (20, 20), font)
+                            pygame.display.update()
                         current_time = pygame.time.get_ticks()
                         if current_time - typing_timer > text_speed and typing_index < len(typing_effect_text):
                             typed_text += typing_effect_text[typing_index]

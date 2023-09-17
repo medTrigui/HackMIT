@@ -1,5 +1,6 @@
 import pygame
 import sys
+import textwrap
 
 # Initialize Pygame
 pygame.init()
@@ -16,9 +17,9 @@ BUTTON_TEXT_COLOR = (255, 255, 255)
 pages = {
     1: {"text": "You find a fork in the road. Which path do you choose?", "options": ["Left", "Right"], "goto": [2, 3]},
     2: {"text": "You encounter a friendly troll. What do you do?", "options": ["Talk to the troll", "Ignore the troll"], "goto": [4, 5]},
-    3: {"text": "You come across a deep river. How do you cross it?", "options": ["Swim", "Build a raft"], "goto": [6, 7]},
+    3: {"text": "You co me across a deep river. How do you cross it?", "options": ["Swim", "Build a raft"], "goto": [6, 7]},
     4: {"text": "The troll gives you a magical key. You continue on your journey.", "options": ["yes","no"], "goto": [1,6]},
-    5: {"text": "You decide to ignore the troll and move forward.", "options": ["ye2s","nso"], "goto": [5,4]},
+    5: {"text": "You decide to ignore the troll and move forward.", "options": ["ye2s","nso"], "goto": [7,4]},
     6: {"text": "You swim across the river but are exhausted. You continue on your journey.", "options": ["yegs","n2o"], "goto": [7,2]},
     7: {"text": "You build a raft and safely cross the river. You continue on your journey.", "options": ["ybes","n1o"], "goto": [1,6]},
 }
@@ -86,7 +87,6 @@ while running:
             button.handle_event(event)
     
     SCREEN.fill(WHITE)
-    
     page_info = pages[current_page]
     text_surface = FONT.render(page_info["text"], True, (0, 0, 0))
     text_rect = text_surface.get_rect(center=(SCREEN.get_width() // 2, SCREEN.get_height() * 0.3))
@@ -99,6 +99,7 @@ while running:
     
     for button in buttons:
         button.draw()
+
     
     pygame.display.flip()
 
