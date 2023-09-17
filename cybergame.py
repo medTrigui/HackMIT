@@ -17,6 +17,7 @@ BUTTON_HOVER_TEXT_COLOR = (255, 255, 255)  # White
 BUTTON_WIDTH, BUTTON_HEIGHT = 200, 50
 BUTTON_RADIUS = 10
 SMALL_BUTTON_WIDTH, SMALL_BUTTON_HEIGHT = 50, 30
+MAX_LINE_WIDTH = 400
 
 # Create the Pygame window
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -25,6 +26,7 @@ pygame.display.set_caption("Cyber Awareness Game")
 # Load fonts
 font_title = pygame.font.Font(None, 56)  # Use the default font ("Courier")
 font_button = pygame.font.Font(None, 36)
+font_text = pygame.font.Font(None, 24)
 font_small_button = pygame.font.Font(None, 18)
 
 # Input username
@@ -116,10 +118,10 @@ while running:
         elif game_state == "level2":
             if option1_button_rect.collidepoint(event.pos):
                 # Handle clicking "Option 1" to transition to Level 3
-                game_state = "level3"
+                game_state = "level2_1"
             elif option2_button_rect.collidepoint(event.pos):
                 # Handle clicking "Option 2" to transition to Level 4
-                game_state = "level4"
+                game_state = "level2_2"
         
         
         elif event.type == pygame.KEYDOWN:
@@ -244,25 +246,39 @@ while running:
             option2_button_text_rect = option2_button_text.get_rect(center=option2_button_rect.center)
             screen.blit(option2_button_text, option2_button_text_rect)
             
-    elif game_state == "level3":
+    elif game_state == "level2_1":
         # Clear the screen
         screen.fill(BG_COLOR)
 
         # Display Level 3 text
-        level3_text = '''Devon has been playing the game for a couple of weeks now, and he even participates in online tournaments against other players.'''
-        level3_display_text = font_small_button.render(level3_text, True, TEXT_COLOR)
-        level3_display_text_rect = level3_display_text.get_rect(center=(WIDTH // 2, 300))
-        screen.blit(level3_display_text, level3_display_text_rect)
+        level2_1_text = '''Devon has been playing the game for a couple of weeks now, and he even participates in online tournaments against other players.'''
+        level2_1_display_text = font_small_button.render(level2_1_text, True, TEXT_COLOR)
+        level2_1_display_text_rect = level2_1_display_text.get_rect(center=(WIDTH // 2, 300))
+        screen.blit(level2_1_display_text, level2_1_display_text_rect)
 
-    elif game_state == "level4":
+    elif game_state == "level2_2":
         # Clear the screen
         screen.fill(BG_COLOR)
 
         # Display Level 4 text
-        level4_text = '''Devon has been playing the game for a couple of weeks now, and he’s on a 30-day streak of completing his daily challenges in the app. There was a power outage in his neighborhood and he’s worried that he’ll lose his streak if he does not complete his challenge. So he messages his best friend, Michael, and asks him to log into his account and complete his challenge for him. Michael says that he’ll do it and asks Devon to send the password to his account. What should Devon do?'''
-        level4_display_text = font_small_button.render(level4_text, True, TEXT_COLOR)
+        level2_2_text = '''Devon has been playing the game for a couple of weeks now, and he’s on a 30-day streak of completing his daily challenges in the app.
+        There was a power outage in his neighborhood and he’s worried that he’ll lose his streak if he does not complete his challenge.
+        So he messages his best friend, Michael, and asks him to log into his account and complete his challenge for him. Michael says that he’ll do it and asks Devon
+        to send the password to his account. What should Devon do?'''
+        # Wrap the text
+        wrapped_text: list = []
+        for line in level2_2_text.splitlines():
+            wrapped_text.extend(textwrap.wrap(line, width=MAX_LINE_WIDTH))
+
+        '''level4_display_text = font_small_button.render(level4_text, True, TEXT_COLOR)
         level4_display_text_rect = level4_display_text.get_rect(center=(WIDTH // 2, 300))
-        screen.blit(level4_display_text, level4_display_text_rect)
+        screen.blit(level4_display_text, level4_display_text_rect)'''
+        y_position = 50  # Adjust the vertical position
+        for line in wrapped_text:
+            line_surface = font_text.render(line, True, TEXT_COLOR)
+            text_width, text_height = line_surface.get_size()
+            screen.blit(line_surface, ((WIDTH - text_width) // 2, y_position))
+            y_position += text_height + 5  # Adjust the vertical spacing
 
     # Update the display
     pygame.display.flip()
