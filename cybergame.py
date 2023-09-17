@@ -1,11 +1,12 @@
 import pygame
 import sys
+import textwrap
 
 # Initialize Pygame
 pygame.init()
 
 # Constants
-WIDTH, HEIGHT = 1200, 750
+WIDTH, HEIGHT = 1366, 766
 BG_COLOR = (46, 49, 49)        # Dark Gray
 TEXT_COLOR = (255, 255, 255)   # White
 BUTTON_COLOR = (52, 152, 219)  # Blue
@@ -40,12 +41,22 @@ back_to_menu_button_rect = pygame.Rect(10, 10, SMALL_BUTTON_WIDTH, SMALL_BUTTON_
 back_to_menu_color = BUTTON_COLOR
 back_to_menu_text_color = BUTTON_TEXT_COLOR
 
+# Create continue button #1
+continue_button_rect = pygame.Rect(WIDTH - 140, HEIGHT - 60, 100, 30)   # Adjust dimensions and position
+
 # Username placeholder text
 placeholder_text = "Enter your username"
 placeholder_font = pygame.font.Font(None, )  # You can adjust the font size
 
 # Game state
 game_state = "menu"  # Initial state is the menu
+
+# Text typing effect
+typing_effect_text = '''Introduction: In an era of constantly evolving cybersecurity threats, the digital landscape presents ever-increasing challenges. Every year, new and more sophisticated forms of malware emerge, putting individuals' personal information and digital security at risk. Whether it's safeguarding your passwords, staying vigilant against phishing attempts, protecting your data, or navigating the internet securely. The choices you make in your daily online life can have significant consequences. In this series, we embark on a journey to impart essential knowledge about password security, phishing awareness, data protection, and safe internet usage. Our aim is to engage and educate you in a fun and interactive manner, empowering you to navigate the digital realm with confidence. By arming yourself with these skills, you can effectively thwart cybercriminals' traps and safeguard your personal information in today's ever-evolving digital world.'''
+typed_text = ""
+text_speed = 50  # Adjust the speed by changing the delay (lower value for faster typing)
+typing_index = 0
+typing_timer = pygame.time.get_ticks()
 
 # Main loop
 running = True
@@ -62,8 +73,20 @@ while running:
                         # Switch to the game state
                         game_state = "level1"
                     elif game_state == "level1":
-                        # Implement actions for level 1 here
-                        pass
+                        # Display the sentences with word wrapping
+                        current_time = pygame.time.get_ticks()
+                        if current_time - typing_timer > text_speed and typing_index < len(typing_effect_text):
+                            typed_text += typing_effect_text[typing_index]
+                            typing_index += 1
+                            typing_timer = current_time
+
+                            # Check if the typed text exceeds the screen width
+                            if font_button.size(typed_text)[0] > WIDTH - 40:  # Adjust the padding as needed
+                            # Move to the next line
+                                typed_text += "\n"
+                        level1_text = font_button.render(typed_text, True, TEXT_COLOR)
+                        level1_text_rect = level1_text.get_rect(topleft=(20, 20))  # Adjust the position as needed
+                        screen.blit(level1_text, level1_text_rect)
             elif input_rect.collidepoint(event.pos):
                 username_active = not username_active
                 username_color = BUTTON_COLOR if username_active else BUTTON_BORDER_COLOR
@@ -71,6 +94,10 @@ while running:
         elif game_state == "level1" and back_to_menu_button_rect.collidepoint(event.pos):
                 # Handle clicking the "Back to Menu" button in Level 1
                 game_state = "menu"
+        elif game_state == "level1" and continue_button_rect.collidepoint(event.pos):
+            # Handle clicking the "Continue" button in Level 1
+            game_state = "level2"
+    
         
         elif event.type == pygame.KEYDOWN:
             if username_active:
@@ -125,9 +152,16 @@ while running:
             screen.blit(placeholder_render, placeholder_rect)
 
     elif game_state == "level1":
-        # Display the level 1 message
-        level1_text = font_button.render("Welcome to Level 1", True, TEXT_COLOR)
-        level1_text_rect = level1_text.get_rect(center=(WIDTH // 2, 100))
+       
+        # Display the level 1 message with a typing effect
+        current_time = pygame.time.get_ticks()
+        if current_time - typing_timer > text_speed and typing_index < len(typing_effect_text):
+            typed_text += typing_effect_text[typing_index]
+            typing_index += 1
+            typing_timer = current_time
+
+        level1_text = font_button.render(typed_text, True, TEXT_COLOR)
+        level1_text_rect = level1_text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
         screen.blit(level1_text, level1_text_rect)
 
          # Draw the "Back to Menu" button in Level 1
@@ -135,6 +169,29 @@ while running:
         back_to_menu_text = font_small_button.render("Menu", True, back_to_menu_text_color)
         back_to_menu_text_rect = back_to_menu_text.get_rect(center=back_to_menu_button_rect.center)
         screen.blit(back_to_menu_text, back_to_menu_text_rect)
+
+         # Draw the "Continue" button in Level 1
+        pygame.draw.rect(screen, BUTTON_BORDER_COLOR, continue_button_rect)
+        pygame.draw.rect(screen, BUTTON_COLOR, continue_button_rect, border_radius=BUTTON_RADIUS)
+
+        if continue_button_rect.collidepoint(pygame.mouse.get_pos()):
+            pygame.draw.rect(screen, BUTTON_HOVER_COLOR, continue_button_rect, border_radius=BUTTON_RADIUS)
+            continue_button_text = font_small_button.render("Continue", True, BUTTON_HOVER_TEXT_COLOR)
+        else:
+            continue_button_text = font_small_button.render("Continue", True, BUTTON_TEXT_COLOR)
+
+        continue_button_text_rect = continue_button_text.get_rect(center=continue_button_rect.center)
+        screen.blit(continue_button_text, continue_button_text_rect)
+
+    elif game_state == "level2":
+        # Clear the screen
+        screen.fill(BG_COLOR)
+
+        # Display the "Welcome to Level 2" message
+        level2_message = font_title.render("Welcome to Level 2", True, TEXT_COLOR)
+        level2_message_rect = level2_message.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+        screen.blit(level2_message, level2_message_rect)
+
 
     # Update the display
     pygame.display.flip()
