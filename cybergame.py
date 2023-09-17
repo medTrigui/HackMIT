@@ -9,7 +9,7 @@ pygame.init()
 WIDTH, HEIGHT = 1366, 766
 BG_COLOR = (0, 0, 0)        # Black
 TEXT_COLOR = (255, 255, 255)   # White
-BUTTON_COLOR = (52, 152, 219)  # Blue
+BUTTON_COLOR = (255, 0, 0)  # Red
 BUTTON_TEXT_COLOR = (255, 255, 255)  # White
 BUTTON_BORDER_COLOR = (0, 0, 0)  # Dark Blue
 BUTTON_HOVER_COLOR = (255, 255, 255)  # Light Blue
