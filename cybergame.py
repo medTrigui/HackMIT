@@ -16,17 +16,21 @@ BUTTON_HOVER_COLOR = (41, 128, 185)  # Light Blue
 BUTTON_HOVER_TEXT_COLOR = (255, 255, 255)  # White
 BUTTON_WIDTH, BUTTON_HEIGHT = 200, 50
 BUTTON_RADIUS = 10
+FPS = 30
 SMALL_BUTTON_WIDTH, SMALL_BUTTON_HEIGHT = 50, 30
+
 
 # Create the Pygame window
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Cyber Awareness Game")
+clock = pygame.time.Clock()
 
 # Load fonts
 font_title = pygame.font.Font(None, 56)  # Use the default font ("Courier")
 font_button = pygame.font.Font(None, 36)
 font_text = pygame.font.Font(None, 24)
 font_small_button = pygame.font.Font(None, 18)
+font = pygame.font.SysFont('Arial', 64)
 
 # Input username
 input_rect = pygame.Rect((WIDTH - BUTTON_WIDTH) // 2, 400, BUTTON_WIDTH, BUTTON_HEIGHT)
@@ -59,27 +63,35 @@ game_state = "menu"  # Initial state is the menu
 # Text typing effect
 
 def blit_text(surface, text, pos, font, color=pygame.Color('black')):
-    words = [word.split(' ') for word in text.splitlines()]  # 2D array where each row is a list of words.
     space = font.size(' ')[0]  # The width of a space.
     max_width, max_height = surface.get_size()
     x, y = pos
-    for line in words:
-        for word in line:
+    for line in text.splitlines():
+        words = line.split(' ')
+        for word in words:
             word_surface = font.render(word, 0, color)
             word_width, word_height = word_surface.get_size()
             if x + word_width >= max_width:
                 x = pos[0]  # Reset the x.
-                y += word_height  # Start on new row.
+                y += word_height  # Start on a new row.
             surface.blit(word_surface, (x, y))
             x += word_width + space
         x = pos[0]  # Reset the x.
-        y += word_height  # Start on new row.
+        y += word_height  # Start on a new row.
+
 
 typing_effect_text = '''Introduction: In an era of constantly evolving cybersecurity threats, the digital landscape presents ever-increasing challenges. Every year, new and more sophisticated forms of malware emerge, putting individuals' personal information and digital security at risk. Whether it's safeguarding your passwords, staying vigilant against phishing attempts, protecting your data, or navigating the internet securely. The choices you make in your daily online life can have significant consequences. In this series, we embark on a journey to impart essential knowledge about password security, phishing awareness, data protection, and safe internet usage. Our aim is to engage and educate you in a fun and interactive manner, empowering you to navigate the digital realm with confidence. By arming yourself with these skills, you can effectively thwart cybercriminals' traps and safeguard your personal information in today's ever-evolving digital world.'''
 typed_text = ""
 text_speed = 35  # Adjust the speed by changing the delay (lower value for faster typing)
 typing_index = 0
 typing_timer = pygame.time.get_ticks()
+
+# Level 2 text
+level2_text = '''Devon has been counting down to the release of the new CyberRunner video game, an immersive experience where the player gets to simulate being an ethical hacker. He stays up all night thinking of what his username is going to be. After hours of thinking, he finally comes up with a username and goes to bed. When he wakes up, he excitedly turns on his console, but when prompted with creating an account, he realizes that although he thought thoroughly about the username, he forgot an important piece of information - the password. What password should he use?'''
+typed_level2_text = ""
+text_speed_level2 = 35  # Adjust the speed by changing the delay (lower value for faster typing)
+typing_index_level2 = 0
+typing_timer_level2 = pygame.time.get_ticks()
 
 # Main loop
 running = True
@@ -134,6 +146,7 @@ while running:
             game_state = "level2"
 
         elif game_state == "level2":
+            
             if option1_button_rect.collidepoint(event.pos):
                 # Handle clicking "Option 1" to transition to Level 3
                 game_state = "level2_1"
@@ -205,12 +218,14 @@ while running:
 
         level1_text = font_button.render(typed_text, True, TEXT_COLOR)
         level1_text_rect = level1_text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+        blit_text(screen, typed_text, (20, level1_text_rect.top), font_button, color=TEXT_COLOR)
         screen.blit(level1_text, level1_text_rect)
+
         # Check if the typed text exceeds the screen width
-        if font_small_button.size(typed_lines[line_index][:typing_index])[0] > WIDTH - 40:
+        if font_small_button.size(typed_text)[0] > WIDTH - 40:
             line_index += 1  # Move to the next line
 
-        if line_index < len(typed_lines) and typing_index == len(typed_lines[line_index]):
+        if line_index < len(typed_text) and typing_index == len(typed_text[line_index]):
             # Start typing the next line
             line_index += 1
             typing_index = 0
@@ -238,7 +253,13 @@ while running:
         screen.fill(BG_COLOR)
         
         current_time_level2 = pygame.time.get_ticks()
-        if current_time_level2 - typing_timer_level2 > text_speed_level2 and typing_index_level2 < len(level2_text):
+
+        level2_text = font_button.render(typed_text, True, TEXT_COLOR)
+        level2_text_rect = level2_text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+        blit_text(screen, typed_text, (20, level2_text_rect.top), font_button, color=TEXT_COLOR)
+        screen.blit(level2_text, level2_text_rect)
+
+        if current_time_level2 - typing_timer_level2 > text_speed_level2 and typing_index_level2 < len(typed_level2_text):
             typed_level2_text += level2_text[typing_index_level2]
             typing_index_level2 += 1
             typing_timer_level2 = current_time_level2
@@ -286,7 +307,7 @@ while running:
         # Wrap the text
         wrapped_text: list = []
         for line in level2_2_text.splitlines():
-            wrapped_text.extend(textwrap.wrap(line, width=MAX_LINE_WIDTH))
+            wrapped_text.extend(textwrap.wrap(line, width=text_width))
 
         '''level4_display_text = font_small_button.render(level4_text, True, TEXT_COLOR)
         level4_display_text_rect = level4_display_text.get_rect(center=(WIDTH // 2, 300))
