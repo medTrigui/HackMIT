@@ -18,10 +18,6 @@ BUTTON_WIDTH, BUTTON_HEIGHT = 200, 50
 BUTTON_RADIUS = 10
 SMALL_BUTTON_WIDTH, SMALL_BUTTON_HEIGHT = 50, 30
 
-FPS = 30
-screen = pygame.display.set_mode(SIZE, pygame.RESIZABLE)
-clock = pygame.time.Clock()
-
 # Create the Pygame window
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Cyber Awareness Game")
@@ -29,6 +25,7 @@ pygame.display.set_caption("Cyber Awareness Game")
 # Load fonts
 font_title = pygame.font.Font(None, 56)  # Use the default font ("Courier")
 font_button = pygame.font.Font(None, 36)
+font_text = pygame.font.Font(None, 24)
 font_small_button = pygame.font.Font(None, 18)
 
 # Input username
@@ -47,6 +44,10 @@ back_to_menu_text_color = BUTTON_TEXT_COLOR
 
 # Create continue button #1
 continue_button_rect = pygame.Rect(WIDTH - 140, HEIGHT - 60, 100, 30)   # Adjust dimensions and position
+
+# Create "Option 1" and "Option 2" buttons
+option1_button_rect = pygame.Rect((WIDTH - SMALL_BUTTON_WIDTH) // 2 - 100, 500, 100, 30)
+option2_button_rect = pygame.Rect((WIDTH - SMALL_BUTTON_WIDTH) // 2 + 100, 500, 100, 30)
 
 # Username placeholder text
 placeholder_text = "Enter your username"
@@ -76,16 +77,13 @@ def blit_text(surface, text, pos, font, color=pygame.Color('black')):
 
 typing_effect_text = '''Introduction: In an era of constantly evolving cybersecurity threats, the digital landscape presents ever-increasing challenges. Every year, new and more sophisticated forms of malware emerge, putting individuals' personal information and digital security at risk. Whether it's safeguarding your passwords, staying vigilant against phishing attempts, protecting your data, or navigating the internet securely. The choices you make in your daily online life can have significant consequences. In this series, we embark on a journey to impart essential knowledge about password security, phishing awareness, data protection, and safe internet usage. Our aim is to engage and educate you in a fun and interactive manner, empowering you to navigate the digital realm with confidence. By arming yourself with these skills, you can effectively thwart cybercriminals' traps and safeguard your personal information in today's ever-evolving digital world.'''
 typed_text = ""
-text_speed = 50  # Adjust the speed by changing the delay (lower value for faster typing)
+text_speed = 35  # Adjust the speed by changing the delay (lower value for faster typing)
 typing_index = 0
 typing_timer = pygame.time.get_ticks()
 
-font = pygame.font.SysFont('Arial', 64)
-
-
-
 # Main loop
 running = True
+line_index = 0
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -134,7 +132,15 @@ while running:
         elif game_state == "level1" and continue_button_rect.collidepoint(event.pos):
             # Handle clicking the "Continue" button in Level 1
             game_state = "level2"
-    
+
+        elif game_state == "level2":
+            if option1_button_rect.collidepoint(event.pos):
+                # Handle clicking "Option 1" to transition to Level 3
+                game_state = "level2_1"
+            elif option2_button_rect.collidepoint(event.pos):
+                # Handle clicking "Option 2" to transition to Level 4
+                game_state = "level2_2"
+        
         
         elif event.type == pygame.KEYDOWN:
             if username_active:
@@ -200,7 +206,14 @@ while running:
         level1_text = font_button.render(typed_text, True, TEXT_COLOR)
         level1_text_rect = level1_text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
         screen.blit(level1_text, level1_text_rect)
+        # Check if the typed text exceeds the screen width
+        if font_small_button.size(typed_lines[line_index][:typing_index])[0] > WIDTH - 40:
+            line_index += 1  # Move to the next line
 
+        if line_index < len(typed_lines) and typing_index == len(typed_lines[line_index]):
+            # Start typing the next line
+            line_index += 1
+            typing_index = 0
          # Draw the "Back to Menu" button in Level 1
         pygame.draw.rect(screen, back_to_menu_color, back_to_menu_button_rect, border_radius=BUTTON_RADIUS)
         back_to_menu_text = font_small_button.render("Menu", True, back_to_menu_text_color)
@@ -223,12 +236,67 @@ while running:
     elif game_state == "level2":
         # Clear the screen
         screen.fill(BG_COLOR)
+        
+        current_time_level2 = pygame.time.get_ticks()
+        if current_time_level2 - typing_timer_level2 > text_speed_level2 and typing_index_level2 < len(level2_text):
+            typed_level2_text += level2_text[typing_index_level2]
+            typing_index_level2 += 1
+            typing_timer_level2 = current_time_level2
 
-        # Display the "Welcome to Level 2" message
-        level2_message = font_title.render("Welcome to Level 2", True, TEXT_COLOR)
-        level2_message_rect = level2_message.get_rect(center=(WIDTH // 2, HEIGHT // 2))
-        screen.blit(level2_message, level2_message_rect)
+        level2_display_text = font_button.render(typed_level2_text, True, TEXT_COLOR)
+        level2_display_text_rect = level2_display_text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+        screen.blit(level2_display_text, level2_display_text_rect)
+        
+        if typing_index_level2 >= 558:
+            # Draw "Option 1" button
+            pygame.draw.rect(screen, BUTTON_BORDER_COLOR, option1_button_rect)
+            pygame.draw.rect(screen, BUTTON_COLOR, option1_button_rect, border_radius=BUTTON_RADIUS)
 
+            option1_button_text = font_small_button.render("devongames", True, BUTTON_TEXT_COLOR)
+            option1_button_text_rect = option1_button_text.get_rect(center=option1_button_rect.center)
+            screen.blit(option1_button_text, option1_button_text_rect)
+
+            # Draw "Option 2" button
+            pygame.draw.rect(screen, BUTTON_BORDER_COLOR, option2_button_rect)
+            pygame.draw.rect(screen, BUTTON_COLOR, option2_button_rect, border_radius=BUTTON_RADIUS)
+
+            option2_button_text = font_small_button.render("vU2!dm@Kf&95#", True, BUTTON_TEXT_COLOR)
+            option2_button_text_rect = option2_button_text.get_rect(center=option2_button_rect.center)
+            screen.blit(option2_button_text, option2_button_text_rect)
+            
+    elif game_state == "level2_1":
+        # Clear the screen
+        screen.fill(BG_COLOR)
+
+        # Display Level 3 text
+        level2_1_text = '''Devon has been playing the game for a couple of weeks now, and he even participates in online tournaments against other players.'''
+        level2_1_display_text = font_small_button.render(level2_1_text, True, TEXT_COLOR)
+        level2_1_display_text_rect = level2_1_display_text.get_rect(center=(WIDTH // 2, 300))
+        screen.blit(level2_1_display_text, level2_1_display_text_rect)
+
+    elif game_state == "level2_2":
+        # Clear the screen
+        screen.fill(BG_COLOR)
+
+        # Display Level 4 text
+        level2_2_text = '''Devon has been playing the game for a couple of weeks now, and he’s on a 30-day streak of completing his daily challenges in the app.
+        There was a power outage in his neighborhood and he’s worried that he’ll lose his streak if he does not complete his challenge.
+        So he messages his best friend, Michael, and asks him to log into his account and complete his challenge for him. Michael says that he’ll do it and asks Devon
+        to send the password to his account. What should Devon do?'''
+        # Wrap the text
+        wrapped_text: list = []
+        for line in level2_2_text.splitlines():
+            wrapped_text.extend(textwrap.wrap(line, width=MAX_LINE_WIDTH))
+
+        '''level4_display_text = font_small_button.render(level4_text, True, TEXT_COLOR)
+        level4_display_text_rect = level4_display_text.get_rect(center=(WIDTH // 2, 300))
+        screen.blit(level4_display_text, level4_display_text_rect)'''
+        y_position = 50  # Adjust the vertical position
+        for line in wrapped_text:
+            line_surface = font_text.render(line, True, TEXT_COLOR)
+            text_width, text_height = line_surface.get_size()
+            screen.blit(line_surface, ((WIDTH - text_width) // 2, y_position))
+            y_position += text_height + 5  # Adjust the vertical spacing
 
     # Update the display
     pygame.display.flip()
