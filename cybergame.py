@@ -137,22 +137,21 @@ while running:
             elif input_rect.collidepoint(event.pos):
                 username_active = not username_active
                 username_color = BUTTON_COLOR if username_active else BUTTON_BORDER_COLOR
-        
-        elif game_state == "level1" and back_to_menu_button_rect.collidepoint(event.pos):
+            elif game_state == "level1" and back_to_menu_button_rect.collidepoint(event.pos):
                 # Handle clicking the "Back to Menu" button in Level 1
                 game_state = "menu"
-        elif game_state == "level1" and continue_button_rect.collidepoint(event.pos):
+            elif game_state == "level1" and continue_button_rect.collidepoint(event.pos):
             # Handle clicking the "Continue" button in Level 1
-            game_state = "level2"
+                game_state = "level2"
 
-        elif game_state == "level2":
+            elif game_state == "level2":
             
-            if option1_button_rect.collidepoint(event.pos):
+                if option1_button_rect.collidepoint(event.pos):
                 # Handle clicking "Option 1" to transition to Level 3
-                game_state = "level2_1"
-            elif option2_button_rect.collidepoint(event.pos):
+                    game_state = "level2_1"
+                elif option2_button_rect.collidepoint(event.pos):
                 # Handle clicking "Option 2" to transition to Level 4
-                game_state = "level2_2"
+                    game_state = "level2_2"
         
         
         elif event.type == pygame.KEYDOWN:
@@ -249,26 +248,32 @@ while running:
         screen.blit(continue_button_text, continue_button_text_rect)
 
     elif game_state == "level2":
-        # Clear the screen
+    # Clear the screen
         screen.fill(BG_COLOR)
-        
+
         current_time_level2 = pygame.time.get_ticks()
+        
 
-        level2_text = font_button.render(typed_text, True, TEXT_COLOR)
-        level2_text_rect = level2_text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
-        blit_text(screen, typed_text, (20, level2_text_rect.top), font_button, color=TEXT_COLOR)
-        screen.blit(level2_text, level2_text_rect)
-
-        if current_time_level2 - typing_timer_level2 > text_speed_level2 and typing_index_level2 < len(typed_level2_text):
+        if current_time_level2 - typing_timer_level2 > text_speed_level2 and typing_index_level2 < len(level2_text):
             typed_level2_text += level2_text[typing_index_level2]
             typing_index_level2 += 1
             typing_timer_level2 = current_time_level2
 
+
         level2_display_text = font_button.render(typed_level2_text, True, TEXT_COLOR)
         level2_display_text_rect = level2_display_text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
         screen.blit(level2_display_text, level2_display_text_rect)
-        
-        if typing_index_level2 >= 558:
+
+
+         # Draw the "Back to Menu" button in Level 1
+        pygame.draw.rect(screen, back_to_menu_color, back_to_menu_button_rect, border_radius=BUTTON_RADIUS)
+        back_to_menu_text = font_small_button.render("Menu", True, back_to_menu_text_color)
+        back_to_menu_text_rect = back_to_menu_text.get_rect(center=back_to_menu_button_rect.center)
+        screen.blit(back_to_menu_text, back_to_menu_text_rect)
+
+        print (typing_timer_level2)
+
+        if typing_timer_level2 >= 1500:
             # Draw "Option 1" button
             pygame.draw.rect(screen, BUTTON_BORDER_COLOR, option1_button_rect)
             pygame.draw.rect(screen, BUTTON_COLOR, option1_button_rect, border_radius=BUTTON_RADIUS)
@@ -277,14 +282,14 @@ while running:
             option1_button_text_rect = option1_button_text.get_rect(center=option1_button_rect.center)
             screen.blit(option1_button_text, option1_button_text_rect)
 
-            # Draw "Option 2" button
+        # Draw "Option 2" button
             pygame.draw.rect(screen, BUTTON_BORDER_COLOR, option2_button_rect)
             pygame.draw.rect(screen, BUTTON_COLOR, option2_button_rect, border_radius=BUTTON_RADIUS)
 
             option2_button_text = font_small_button.render("vU2!dm@Kf&95#", True, BUTTON_TEXT_COLOR)
             option2_button_text_rect = option2_button_text.get_rect(center=option2_button_rect.center)
             screen.blit(option2_button_text, option2_button_text_rect)
-            
+
     elif game_state == "level2_1":
         # Clear the screen
         screen.fill(BG_COLOR)
@@ -307,6 +312,8 @@ while running:
         # Wrap the text
         wrapped_text: list = []
         for line in level2_2_text.splitlines():
+            line_surface = font_text.render(line, True, TEXT_COLOR)
+            text_width, text_height = line_surface.get_size()
             wrapped_text.extend(textwrap.wrap(line, width=text_width))
 
         '''level4_display_text = font_small_button.render(level4_text, True, TEXT_COLOR)
